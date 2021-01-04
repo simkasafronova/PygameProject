@@ -43,6 +43,7 @@ class OtherBall(pygame.sprite.Sprite):
                            radius)
         self.rect = pygame.Rect(self.x, self.y, radius * 2, radius * 2)
         self.alpha = 0
+        self.vy = 0
 
     def update(self, *args):
         # круговое движение, работает почему-то только на 1 спрайт
@@ -50,14 +51,15 @@ class OtherBall(pygame.sprite.Sprite):
         # y_hear = round(args[1]) - self.rect.y
         # print(x_hear, y_hear)
         # self.rect = self.rect.move(x_hear, y_hear)
-        self.rect = self.rect.move(1, 0)
-        if self.rect.x == 720:
+        self.rect = self.rect.move(3, self.vy)
+        if self.rect.x >= 720:
             self.rect.x = -10
+        if pygame.sprite.spritecollideany(self, main_balls):
+            self.vy = 2
 
 
-ball = MainBall(300, 350)
-ball2 = MainBall(300, 350)
-ball3 = MainBall(300, 350)
+for i in range(5):
+    MainBall(300, 350)
 # шары, построенные по кругу
 # OtherBall(50, 350)
 # OtherBall(150, 150)
@@ -68,11 +70,10 @@ ball3 = MainBall(300, 350)
 # OtherBall(550, 550)
 # OtherBall(650, 350)
 
-o_b1 = OtherBall(20, 150)
-o_b2 = OtherBall(200, 150)
-o_b3 = OtherBall(380, 150)
-o_b4 = OtherBall(560, 150)
-
+x_coordinate = 20
+for i in range(4):
+    OtherBall(x_coordinate, 150)
+    x_coordinate += 180
 
 # big_radius = 230
 # alpha = 0
