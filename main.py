@@ -1,5 +1,4 @@
 import pygame
-import math
 
 pygame.init()
 size = width, height = 720, 720
@@ -9,6 +8,9 @@ center = width // 2, height // 2
 all_sprites = pygame.sprite.Group()
 other_balls = pygame.sprite.Group()
 main_balls = pygame.sprite.Group()
+
+TIMER_EVENT = pygame.USEREVENT + 1
+pygame.time.set_timer(TIMER_EVENT, 700)
 
 
 class MainBall(pygame.sprite.Sprite):
@@ -46,38 +48,13 @@ class OtherBall(pygame.sprite.Sprite):
         self.vy = 0
 
     def update(self, *args):
-        # круговое движение, работает почему-то только на 1 спрайт
-        # x_hear = round(args[0]) - self.rect.x
-        # y_hear = round(args[1]) - self.rect.y
-        # print(x_hear, y_hear)
-        # self.rect = self.rect.move(x_hear, y_hear)
         self.rect = self.rect.move(3, self.vy)
-        if self.rect.x >= 720:
-            self.rect.x = -10
         if pygame.sprite.spritecollideany(self, main_balls):
             self.vy = 2
 
 
 for i in range(5):
     MainBall(300, 350)
-# шары, построенные по кругу
-# OtherBall(50, 350)
-# OtherBall(150, 150)
-# OtherBall(150, 550)
-# OtherBall(350, 50)
-# OtherBall(350, 650)
-# OtherBall(550, 150)
-# OtherBall(550, 550)
-# OtherBall(650, 350)
-
-x_coordinate = 20
-for i in range(4):
-    OtherBall(x_coordinate, 150)
-    x_coordinate += 180
-
-# big_radius = 230
-# alpha = 0
-# v = 0.03
 
 
 running_states = [0] * 20
@@ -94,13 +71,13 @@ while running:
             if event.key == pygame.K_SPACE:
                 main_ball_number += 1
                 running_states[main_ball_number] = 1
-    # x = center[0] + big_radius * math.cos(alpha)
-    # y = center[1] + big_radius * math.sin(alpha)
+        if event.type == TIMER_EVENT:
+            print('Timer works well!')
+            OtherBall(0, 150)
     all_sprites.draw(screen)
     other_balls.draw(screen)
     other_balls.update()
     main_balls.update(running_states, main_ball_number)
     pygame.display.flip()
     clock.tick(60)
-    # alpha -= v
 pygame.quit()
