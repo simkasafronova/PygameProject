@@ -9,8 +9,10 @@ all_sprites = pygame.sprite.Group()
 other_balls = pygame.sprite.Group()
 main_balls = pygame.sprite.Group()
 
-TIMER_EVENT = pygame.USEREVENT + 1
-pygame.time.set_timer(TIMER_EVENT, 700)
+TIMER_GENERATE_OTHERBALLS = pygame.USEREVENT + 1
+pygame.time.set_timer(TIMER_GENERATE_OTHERBALLS, 700)
+TIMER_CHECK_MAINBALLS = pygame.USEREVENT + 2
+pygame.time.set_timer(TIMER_CHECK_MAINBALLS, 500)
 
 
 class MainBall(pygame.sprite.Sprite):
@@ -25,11 +27,9 @@ class MainBall(pygame.sprite.Sprite):
         self.alpha = 0
 
     def update(self, *args):
-        state_of_sprites = args[0]
-        sprite_index = args[1]
-        if state_of_sprites[sprite_index]:
-            main_balls.sprites()[sprite_index].rect = main_balls.sprites()[
-                sprite_index].rect.move(0, -6)
+        if args[0][0]:
+            main_balls.sprites()[0].rect = main_balls.sprites()[
+                0].rect.move(0, -3)
 
 
 class OtherBall(pygame.sprite.Sprite):
@@ -51,15 +51,16 @@ class OtherBall(pygame.sprite.Sprite):
         self.rect = self.rect.move(3, self.vy)
         if pygame.sprite.spritecollideany(self, main_balls):
             self.vy = 2
+            main_balls.sprites()[0].kill()
+            RUNNING_STATE[0] = 0
 
 
-for i in range(5):
+for i in range(15):
     MainBall(300, 350)
 
 
-running_states = [0] * 20
+RUNNING_STATE = [0]
 clock = pygame.time.Clock()
-main_ball_number = -1
 
 running = True
 while running:
@@ -69,15 +70,22 @@ while running:
             running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                main_ball_number += 1
-                running_states[main_ball_number] = 1
-        if event.type == TIMER_EVENT:
-            print('Timer works well!')
+                RUNNING_STATE[0] = 1
+        if event.type == TIMER_GENERATE_OTHERBALLS:
             OtherBall(0, 150)
+        if event.type == TIMER_CHECK_MAINBALLS:
+            print('timer works well')
+            try:
+                if main_balls.sprites()[0].rect.y < 0:
+                    main_balls.sprites()[0].kill()
+                    RUNNING_STATE[0] = 0
+            except IndexError:
+                print('no balls here')
+                break
     all_sprites.draw(screen)
     other_balls.draw(screen)
     other_balls.update()
-    main_balls.update(running_states, main_ball_number)
+    main_balls.update(RUNNING_STATE)
     pygame.display.flip()
     clock.tick(60)
 pygame.quit()
