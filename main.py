@@ -75,14 +75,15 @@ while running:
         if event.type == TIMER_GENERATE_OTHERBALLS:
             OtherBall(0, 150)
         if event.type == TIMER_CHECK_MAINBALLS:
-            print('timer works well')
+            print(len(main_balls.sprites()))
             try:
+                assert len(main_balls.sprites()) > 3
                 if main_balls.sprites()[0].rect.y < 0:
                     main_balls.sprites()[0].kill()
                     RUNNING_STATE[0] = 0
-            except IndexError:
-                print('no balls here')
-                for i in range(10):
+            except AssertionError:
+                print('only 3 balls')
+                for i in range(7):
                     MainBall(300, 350)
     all_sprites.draw(screen)
     other_balls.draw(screen)
