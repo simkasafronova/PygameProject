@@ -12,7 +12,7 @@ main_balls = pygame.sprite.Group()
 TIMER_GENERATE_OTHERBALLS = pygame.USEREVENT + 1
 pygame.time.set_timer(TIMER_GENERATE_OTHERBALLS, 700)
 TIMER_CHECK_MAINBALLS = pygame.USEREVENT + 2
-pygame.time.set_timer(TIMER_CHECK_MAINBALLS, 500)
+pygame.time.set_timer(TIMER_CHECK_MAINBALLS, 200)
 
 
 class MainBall(pygame.sprite.Sprite):
@@ -29,7 +29,7 @@ class MainBall(pygame.sprite.Sprite):
     def update(self, *args):
         if args[0][0]:
             main_balls.sprites()[0].rect = main_balls.sprites()[
-                0].rect.move(0, -3)
+                0].rect.move(0, -6)
 
 
 class OtherBall(pygame.sprite.Sprite):
@@ -55,7 +55,8 @@ class OtherBall(pygame.sprite.Sprite):
             RUNNING_STATE[0] = 0
 
 
-for i in range(15):
+# почему-то последний спрайт летит медленнее предыдущих
+for i in range(10):
     MainBall(300, 350)
 
 
@@ -81,7 +82,8 @@ while running:
                     RUNNING_STATE[0] = 0
             except IndexError:
                 print('no balls here')
-                break
+                for i in range(10):
+                    MainBall(300, 350)
     all_sprites.draw(screen)
     other_balls.draw(screen)
     other_balls.update()
