@@ -11,6 +11,7 @@ main_balls = pygame.sprite.Group()
 
 TIMER_GENERATE_OTHERBALLS = pygame.USEREVENT + 1
 pygame.time.set_timer(TIMER_GENERATE_OTHERBALLS, 700)
+
 TIMER_CHECK_MAINBALLS = pygame.USEREVENT + 2
 pygame.time.set_timer(TIMER_CHECK_MAINBALLS, 200)
 
@@ -53,6 +54,7 @@ class OtherBall(pygame.sprite.Sprite):
             self.vy = 2
             main_balls.sprites()[0].kill()
             RUNNING_STATE[0] = 0
+            SCORE_COUNTER[0] += 1
 
 
 # почему-то последний спрайт летит медленнее предыдущих
@@ -60,6 +62,30 @@ for i in range(10):
     MainBall(300, 350)
 
 
+def draw_score(surf):
+    score_text = str(SCORE_COUNTER[0])
+    font = pygame.font.Font(None, 50)
+    text = font.render('Счет: ' + score_text, True, (100, 255, 100))
+    text_x, text_y = 20, 600
+    text_w, text_h = text.get_width(), text.get_height()
+    surf.blit(text, (text_x, text_y))
+    pygame.draw.rect(surf, (0, 255, 0), (text_x - 10, text_y - 10, text_w +
+                                         20, text_h + 20), 1)
+
+
+def draw_lives(surf):
+    score_text = str(LIVES_COUNTER[0])
+    font = pygame.font.Font(None, 50)
+    text = font.render('Жизни: ' + score_text, True, (255, 100, 100))
+    text_x, text_y = 540, 600
+    text_w, text_h = text.get_width(), text.get_height()
+    surf.blit(text, (text_x, text_y))
+    pygame.draw.rect(surf, (255, 0, 0), (text_x - 10, text_y - 10, text_w +
+                                         20, text_h + 20), 1)
+
+
+SCORE_COUNTER = [0]
+LIVES_COUNTER = [3]
 RUNNING_STATE = [0]
 clock = pygame.time.Clock()
 
@@ -75,16 +101,18 @@ while running:
         if event.type == TIMER_GENERATE_OTHERBALLS:
             OtherBall(0, 150)
         if event.type == TIMER_CHECK_MAINBALLS:
-            print(len(main_balls.sprites()))
             try:
                 assert len(main_balls.sprites()) > 3
                 if main_balls.sprites()[0].rect.y < 0:
+                    LIVES_COUNTER[0] -= 1
                     main_balls.sprites()[0].kill()
                     RUNNING_STATE[0] = 0
             except AssertionError:
                 print('only 3 balls')
                 for i in range(7):
                     MainBall(300, 350)
+    draw_score(screen)
+    draw_lives(screen)
     all_sprites.draw(screen)
     other_balls.draw(screen)
     other_balls.update()
