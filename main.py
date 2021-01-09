@@ -1,9 +1,9 @@
 import pygame
+import pygame_gui
 
 pygame.init()
 size = width, height = 720, 720
-screen = pygame.display.set_mode(size)
-center = width // 2, height // 2
+screen = pygame.display.set_mode((720, 720))
 
 all_sprites = pygame.sprite.Group()
 other_balls = pygame.sprite.Group()
@@ -89,34 +89,64 @@ LIVES_COUNTER = [3]
 RUNNING_STATE = [0]
 clock = pygame.time.Clock()
 
-running = True
-while running:
-    screen.fill((50, 68, 71))
+
+def play():
+    main_play_running = True
+    while main_play_running:
+        screen.fill((50, 68, 71))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                main_play_running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    RUNNING_STATE[0] = 1
+            if event.type == TIMER_GENERATE_OTHERBALLS:
+                OtherBall(0, 150)
+            if event.type == TIMER_CHECK_MAINBALLS:
+                try:
+                    assert len(main_balls.sprites()) > 3
+                    if main_balls.sprites()[0].rect.y < 0:
+                        LIVES_COUNTER[0] -= 1
+                        main_balls.sprites()[0].kill()
+                        RUNNING_STATE[0] = 0
+                except AssertionError:
+                    print('only 3 balls')
+                    for i in range(7):
+                        MainBall(300, 350)
+        print('play')
+        draw_score(screen)
+        draw_lives(screen)
+        all_sprites.draw(screen)
+        other_balls.draw(screen)
+        other_balls.update()
+        main_balls.update(RUNNING_STATE)
+        pygame.display.flip()
+        clock.tick(60)
+
+
+start_menu_manager = pygame_gui.UIManager((720, 720))
+start_playing_button = pygame_gui.elements.UIButton(
+    relative_rect=pygame.Rect((330, 330), (100, 50)),
+    text='PLAY',
+    manager=start_menu_manager
+)
+
+start_menu_clock = pygame.time.Clock()
+first_menu_running = True
+while first_menu_running:
+    time_delta = start_menu_clock.tick(60) / 100
+    screen.fill((0, 0, 0))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            running = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                RUNNING_STATE[0] = 1
-        if event.type == TIMER_GENERATE_OTHERBALLS:
-            OtherBall(0, 150)
-        if event.type == TIMER_CHECK_MAINBALLS:
-            try:
-                assert len(main_balls.sprites()) > 3
-                if main_balls.sprites()[0].rect.y < 0:
-                    LIVES_COUNTER[0] -= 1
-                    main_balls.sprites()[0].kill()
-                    RUNNING_STATE[0] = 0
-            except AssertionError:
-                print('only 3 balls')
-                for i in range(7):
-                    MainBall(300, 350)
-    draw_score(screen)
-    draw_lives(screen)
-    all_sprites.draw(screen)
-    other_balls.draw(screen)
-    other_balls.update()
-    main_balls.update(RUNNING_STATE)
+            first_menu_running = False
+        if event.type == pygame.USEREVENT:
+            if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
+                if event.ui_element == start_playing_button:
+                    play()
+        start_menu_manager.process_events(event)
+    start_menu_manager.update(time_delta)
+    start_menu_manager.draw_ui(screen)
+    print('first menu')
     pygame.display.flip()
-    clock.tick(60)
 pygame.quit()
+
