@@ -8,7 +8,7 @@ screen = pygame.display.set_mode((720, 720))
 all_sprites = pygame.sprite.Group()
 other_balls = pygame.sprite.Group()
 main_balls = pygame.sprite.Group()
-
+0
 TIMER_GENERATE_OTHERBALLS = pygame.USEREVENT + 1
 pygame.time.set_timer(TIMER_GENERATE_OTHERBALLS, 700)
 
@@ -90,6 +90,44 @@ RUNNING_STATE = [0]
 clock = pygame.time.Clock()
 
 
+def finish():
+    finish_menu_manager = pygame_gui.UIManager((720, 720))
+
+    another_play_button = pygame_gui.elements.UIButton(
+        relative_rect=pygame.Rect((300, 100), (150, 100)),
+        text='PLAY AGAIN',
+        manager=finish_menu_manager
+    )
+
+    go_to_start_menu_button = pygame_gui.elements.UIButton(
+        relative_rect=pygame.Rect((300, 200), (150, 100)),
+        text='GO TO START MENU',
+        manager=finish_menu_manager
+    )
+
+    finish_menu_clock = pygame.time.Clock()
+    finish_menu_running = True
+    while finish_menu_running:
+        time_delta2 = finish_menu_clock.tick(60) / 100
+        screen.fill((0, 0, 0))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                finish_menu_running = False
+            if event.type == pygame.USEREVENT:
+                if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
+                    if event.ui_element == go_to_start_menu_button:
+                        finish_menu_running = False
+                    elif event.ui_element == another_play_button:
+                        LIVES_COUNTER[0] = 3
+                        play()
+                        finish_menu_running = False
+            finish_menu_manager.process_events(event)
+        finish_menu_manager.update(time_delta2)
+        finish_menu_manager.draw_ui(screen)
+        #print('finish menu')
+        pygame.display.flip()
+
+
 def play():
     main_play_running = True
     while main_play_running:
@@ -109,11 +147,14 @@ def play():
                         LIVES_COUNTER[0] -= 1
                         main_balls.sprites()[0].kill()
                         RUNNING_STATE[0] = 0
+                        if LIVES_COUNTER[0] == 0:
+                            main_play_running = False
+                            finish()
                 except AssertionError:
                     print('only 3 balls')
                     for i in range(7):
                         MainBall(300, 350)
-        print('play')
+        #print('play')
         draw_score(screen)
         draw_lives(screen)
         all_sprites.draw(screen)
@@ -146,7 +187,7 @@ while first_menu_running:
         start_menu_manager.process_events(event)
     start_menu_manager.update(time_delta)
     start_menu_manager.draw_ui(screen)
-    print('first menu')
+    #print('first menu')
     pygame.display.flip()
 pygame.quit()
 
