@@ -23,11 +23,11 @@ def load_image(name, colorkey=None):
 def draw_score(surf):
     score_text = str(SCORE_COUNTER[0])
     font = pygame.font.Font(None, 50)
-    text = font.render('Счет: ' + score_text, True, (100, 255, 100))
+    text = font.render('Счет: ' + score_text, True, (255, 255, 100))
     text_x, text_y = 20, 600
     text_w, text_h = text.get_width(), text.get_height()
     surf.blit(text, (text_x, text_y))
-    pygame.draw.rect(surf, (0, 255, 0), (text_x - 10, text_y - 10, text_w +
+    pygame.draw.rect(surf, (255, 255, 0), (text_x - 10, text_y - 10, text_w +
                                          20, text_h + 20), 1)
 
 

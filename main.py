@@ -1,62 +1,8 @@
 from initialization import *
 import pygame_gui
-import random
-from functions import load_image, draw_lives, draw_score
+from functions import draw_lives, draw_score
 from constants import *
-
-
-class Particle(pygame.sprite.Sprite):
-    # сгенерируем частицы разного размера
-    many_stars = [load_image("star.png")]
-    for scale in (5, 10, 20):
-        many_stars.append(pygame.transform.scale(many_stars[0], (scale, scale)))
-
-    many_hearts = [load_image("heart.png")]
-    for scale in (5, 10, 20):
-        many_hearts.append(pygame.transform.scale(many_hearts[0], (scale, scale)))
-
-    def __init__(self, pos, dx, dy, name):
-        super().__init__(all_sprites)
-        self.add(stars)
-        if name == 'star':
-            self.image = random.choice(self.many_stars)
-        elif name == 'heart':
-            self.image = random.choice(self.many_hearts)
-        self.rect = self.image.get_rect()
-
-        # у каждой частицы своя скорость — это вектор
-        self.velocity = [dx, dy]
-        # и свои координаты
-        self.rect.x, self.rect.y = pos
-
-        # гравитация будет одинаковой (значение константы)
-        self.gravity = GRAVITY
-
-    def update(self):
-        # применяем гравитационный эффект:
-        # движение с ускорением под действием гравитации
-        self.velocity[1] += self.gravity
-        # перемещаем частицу
-        self.rect.x += self.velocity[0]
-        self.rect.y += self.velocity[1]
-        # убиваем, если частица ушла за экран
-        if not self.rect.colliderect(screen_rect):
-            self.kill()
-
-
-def create_particles(position, item):
-    # количество создаваемых частиц
-    particle_count = 20
-    # возможные скорости
-    numbers = range(-5, 6)
-    if item == 'star':
-        for _ in range(particle_count):
-            Particle(position, random.choice(numbers), random.choice(
-                numbers), 'star')
-    else:
-        for _ in range(particle_count):
-            Particle(position, random.choice(numbers), random.choice(
-                numbers), 'heart')
+from particles import create_particles
 
 
 class MainBall(pygame.sprite.Sprite):
@@ -66,7 +12,7 @@ class MainBall(pygame.sprite.Sprite):
         self.radius = radius
         self.image = pygame.Surface((radius * 2, radius * 2),
                                     pygame.SRCALPHA, 32)
-        pygame.draw.circle(self.image, (252, 186, 3), (radius, radius), radius)
+        pygame.draw.circle(self.image, (89, 36, 145), (radius, radius), radius)
         self.rect = pygame.Rect(main_x, main_y, radius * 2, radius * 2)
         self.alpha = 0
 
@@ -85,7 +31,7 @@ class OtherBall(pygame.sprite.Sprite):
         self.add(other_balls)
         self.image = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA,
                                     32)
-        pygame.draw.circle(self.image, (63, 176, 196), (radius, radius),
+        pygame.draw.circle(self.image, (74, 201, 48), (radius, radius),
                            radius)
         self.rect = pygame.Rect(self.x, self.y, radius * 2, radius * 2)
         self.alpha = 0
@@ -113,7 +59,7 @@ class OtherBall(pygame.sprite.Sprite):
 
 
 for i in range(10):
-    MainBall(300, 350)
+    MainBall(320, 350)
 
 clock = pygame.time.Clock()
 
@@ -122,13 +68,13 @@ def finish():
     finish_menu_manager = pygame_gui.UIManager((720, 720))
 
     another_play_button = pygame_gui.elements.UIButton(
-        relative_rect=pygame.Rect((300, 100), (150, 100)),
+        relative_rect=pygame.Rect((285, 100), (150, 100)),
         text='PLAY AGAIN',
         manager=finish_menu_manager
     )
 
     go_to_start_menu_button = pygame_gui.elements.UIButton(
-        relative_rect=pygame.Rect((300, 200), (150, 100)),
+        relative_rect=pygame.Rect((285, 200), (150, 100)),
         text='GO TO START MENU',
         manager=finish_menu_manager
     )
@@ -137,7 +83,7 @@ def finish():
     finish_menu_running = True
     while finish_menu_running:
         time_delta2 = finish_menu_clock.tick(60) / 100
-        screen.fill((0, 0, 0))
+        screen.fill((25, 25, 25))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 finish_menu_running = False
@@ -158,7 +104,7 @@ def finish():
 def play():
     main_play_running = True
     while main_play_running:
-        screen.fill((50, 68, 71))
+        screen.fill((25, 25, 25))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 main_play_running = False
@@ -184,7 +130,7 @@ def play():
                 except AssertionError:
                     print('only 3 balls')
                     for i in range(7):
-                        MainBall(300, 350)
+                        MainBall(320, 350)
         draw_score(screen)
         draw_lives(screen)
         stars.draw(screen)
@@ -199,7 +145,7 @@ def play():
 
 start_menu_manager = pygame_gui.UIManager((720, 720))
 start_playing_button = pygame_gui.elements.UIButton(
-    relative_rect=pygame.Rect((330, 330), (100, 50)),
+    relative_rect=pygame.Rect((310, 335), (100, 50)),
     text='PLAY',
     manager=start_menu_manager
 )
@@ -208,7 +154,7 @@ start_menu_clock = pygame.time.Clock()
 first_menu_running = True
 while first_menu_running:
     time_delta = start_menu_clock.tick(60) / 100
-    screen.fill((0, 0, 0))
+    screen.fill((25, 25, 25))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             first_menu_running = False
