@@ -1,50 +1,8 @@
-import pygame
+from initialization import *
 import pygame_gui
 import random
-import os
-import sys
-
-pygame.init()
-size = width, height = 720, 720
-screen = pygame.display.set_mode((720, 720))
-screen_rect = (0, 0, width, height)
-
-all_sprites = pygame.sprite.Group()
-other_balls = pygame.sprite.Group()
-main_balls = pygame.sprite.Group()
-stars = pygame.sprite.Group()
-
-TIMER_GENERATE_OTHERBALLS = pygame.USEREVENT + 1
-pygame.time.set_timer(TIMER_GENERATE_OTHERBALLS, 800)
-
-TIMER_CHECK_MAINBALLS = pygame.USEREVENT + 2
-pygame.time.set_timer(TIMER_CHECK_MAINBALLS, 500)
-
-TIMER_CHANGE_MODE = pygame.USEREVENT + 3
-pygame.time.set_timer(TIMER_CHANGE_MODE, 4000)
-
-TO_GENERATE_STARS = [0]
-TO_GENERATE_HEARTS = [0]
-
-
-
-def load_image(name, colorkey=None):
-    fullname = os.path.join('images', name)
-    if not os.path.isfile(fullname):
-        print(f"Файл с изображением '{fullname}' не найден")
-        sys.exit()
-    image = pygame.image.load(fullname)
-    if colorkey is not None:
-        image = image.convert()
-        if colorkey == -1:
-            colorkey = image.get_at((0, 0))
-        image.set_colorkey(colorkey)
-    else:
-        image = image.convert_alpha()
-    return image
-
-
-GRAVITY = 0.5
+from functions import load_image, draw_lives, draw_score
+from constants import *
 
 
 class Particle(pygame.sprite.Sprite):
@@ -157,32 +115,6 @@ class OtherBall(pygame.sprite.Sprite):
 for i in range(10):
     MainBall(300, 350)
 
-
-def draw_score(surf):
-    score_text = str(SCORE_COUNTER[0])
-    font = pygame.font.Font(None, 50)
-    text = font.render('Счет: ' + score_text, True, (100, 255, 100))
-    text_x, text_y = 20, 600
-    text_w, text_h = text.get_width(), text.get_height()
-    surf.blit(text, (text_x, text_y))
-    pygame.draw.rect(surf, (0, 255, 0), (text_x - 10, text_y - 10, text_w +
-                                         20, text_h + 20), 1)
-
-
-def draw_lives(surf):
-    score_text = str(LIVES_COUNTER[0])
-    font = pygame.font.Font(None, 50)
-    text = font.render('Жизни: ' + score_text, True, (255, 100, 100))
-    text_x, text_y = 540, 600
-    text_w, text_h = text.get_width(), text.get_height()
-    surf.blit(text, (text_x, text_y))
-    pygame.draw.rect(surf, (255, 0, 0), (text_x - 10, text_y - 10, text_w +
-                                         20, text_h + 20), 1)
-
-
-SCORE_COUNTER = [0]
-LIVES_COUNTER = [3]
-RUNNING_STATE = [0]
 clock = pygame.time.Clock()
 
 
@@ -220,9 +152,7 @@ def finish():
             finish_menu_manager.process_events(event)
         finish_menu_manager.update(time_delta2)
         finish_menu_manager.draw_ui(screen)
-        #print('finish menu')
         pygame.display.flip()
-
 
 
 def play():
@@ -255,7 +185,6 @@ def play():
                     print('only 3 balls')
                     for i in range(7):
                         MainBall(300, 350)
-        #print('play')
         draw_score(screen)
         draw_lives(screen)
         stars.draw(screen)
@@ -266,7 +195,6 @@ def play():
         main_balls.update(RUNNING_STATE)
         pygame.display.flip()
         clock.tick(60)
-
 
 
 start_menu_manager = pygame_gui.UIManager((720, 720))
@@ -291,7 +219,6 @@ while first_menu_running:
         start_menu_manager.process_events(event)
     start_menu_manager.update(time_delta)
     start_menu_manager.draw_ui(screen)
-    #print('first menu')
     pygame.display.flip()
 pygame.quit()
 
