@@ -1,19 +1,104 @@
 import pygame
 import pygame_gui
+import random
+import os
+import sys
 
 pygame.init()
 size = width, height = 720, 720
 screen = pygame.display.set_mode((720, 720))
+screen_rect = (0, 0, width, height)
 
 all_sprites = pygame.sprite.Group()
 other_balls = pygame.sprite.Group()
 main_balls = pygame.sprite.Group()
-0
+stars = pygame.sprite.Group()
+
 TIMER_GENERATE_OTHERBALLS = pygame.USEREVENT + 1
-pygame.time.set_timer(TIMER_GENERATE_OTHERBALLS, 700)
+pygame.time.set_timer(TIMER_GENERATE_OTHERBALLS, 800)
 
 TIMER_CHECK_MAINBALLS = pygame.USEREVENT + 2
-pygame.time.set_timer(TIMER_CHECK_MAINBALLS, 200)
+pygame.time.set_timer(TIMER_CHECK_MAINBALLS, 500)
+
+TIMER_CHANGE_MODE = pygame.USEREVENT + 3
+pygame.time.set_timer(TIMER_CHANGE_MODE, 4000)
+
+TO_GENERATE_STARS = [0]
+TO_GENERATE_HEARTS = [0]
+
+
+
+def load_image(name, colorkey=None):
+    fullname = os.path.join('images', name)
+    if not os.path.isfile(fullname):
+        print(f"Файл с изображением '{fullname}' не найден")
+        sys.exit()
+    image = pygame.image.load(fullname)
+    if colorkey is not None:
+        image = image.convert()
+        if colorkey == -1:
+            colorkey = image.get_at((0, 0))
+        image.set_colorkey(colorkey)
+    else:
+        image = image.convert_alpha()
+    return image
+
+
+GRAVITY = 0.5
+
+
+class Particle(pygame.sprite.Sprite):
+    # сгенерируем частицы разного размера
+    many_stars = [load_image("star.png")]
+    for scale in (5, 10, 20):
+        many_stars.append(pygame.transform.scale(many_stars[0], (scale, scale)))
+
+    many_hearts = [load_image("heart.png")]
+    for scale in (5, 10, 20):
+        many_hearts.append(pygame.transform.scale(many_hearts[0], (scale, scale)))
+
+    def __init__(self, pos, dx, dy, name):
+        super().__init__(all_sprites)
+        self.add(stars)
+        if name == 'star':
+            self.image = random.choice(self.many_stars)
+        elif name == 'heart':
+            self.image = random.choice(self.many_hearts)
+        self.rect = self.image.get_rect()
+
+        # у каждой частицы своя скорость — это вектор
+        self.velocity = [dx, dy]
+        # и свои координаты
+        self.rect.x, self.rect.y = pos
+
+        # гравитация будет одинаковой (значение константы)
+        self.gravity = GRAVITY
+
+    def update(self):
+        # применяем гравитационный эффект:
+        # движение с ускорением под действием гравитации
+        self.velocity[1] += self.gravity
+        # перемещаем частицу
+        self.rect.x += self.velocity[0]
+        self.rect.y += self.velocity[1]
+        # убиваем, если частица ушла за экран
+        if not self.rect.colliderect(screen_rect):
+            self.kill()
+
+
+def create_particles(position, item):
+    # количество создаваемых частиц
+    particle_count = 20
+    # возможные скорости
+    numbers = range(-5, 6)
+    if item == 'star':
+        for _ in range(particle_count):
+            Particle(position, random.choice(numbers), random.choice(
+                numbers), 'star')
+    else:
+        for _ in range(particle_count):
+            Particle(position, random.choice(numbers), random.choice(
+                numbers), 'heart')
 
 
 class MainBall(pygame.sprite.Sprite):
@@ -49,15 +134,26 @@ class OtherBall(pygame.sprite.Sprite):
         self.vy = 0
 
     def update(self, *args):
+        if self.rect.x >= 720:
+            self.kill()
         self.rect = self.rect.move(3, self.vy)
         if pygame.sprite.spritecollideany(self, main_balls):
+            TO_GENERATE_STARS[0] += 1
+            TO_GENERATE_HEARTS[0] += 1
+            coords = self.rect.x, self.rect.y
+            if TO_GENERATE_STARS[0] % 7 == 0:
+                create_particles(coords, 'star')
+                SCORE_COUNTER[0] += 1
+            if TO_GENERATE_HEARTS[0] % 11 == 0:
+                create_particles(coords, 'heart')
+                LIVES_COUNTER[0] += 1
             self.vy = 2
             main_balls.sprites()[0].kill()
+            self.kill()
             RUNNING_STATE[0] = 0
             SCORE_COUNTER[0] += 1
 
 
-# почему-то последний спрайт летит медленнее предыдущих
 for i in range(10):
     MainBall(300, 350)
 
@@ -128,6 +224,7 @@ def finish():
         pygame.display.flip()
 
 
+
 def play():
     main_play_running = True
     while main_play_running:
@@ -148,8 +245,12 @@ def play():
                         main_balls.sprites()[0].kill()
                         RUNNING_STATE[0] = 0
                         if LIVES_COUNTER[0] == 0:
+                            SCORE_COUNTER[0] = 0
                             main_play_running = False
+                            other_balls.empty()
                             finish()
+                            for i in range(len(other_balls.sprites())):
+                                other_balls.sprites()[i].kill()
                 except AssertionError:
                     print('only 3 balls')
                     for i in range(7):
@@ -157,12 +258,15 @@ def play():
         #print('play')
         draw_score(screen)
         draw_lives(screen)
+        stars.draw(screen)
+        stars.update()
         all_sprites.draw(screen)
         other_balls.draw(screen)
         other_balls.update()
         main_balls.update(RUNNING_STATE)
         pygame.display.flip()
         clock.tick(60)
+
 
 
 start_menu_manager = pygame_gui.UIManager((720, 720))
