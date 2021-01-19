@@ -34,9 +34,23 @@ def draw_score(surf):
 def draw_lives(surf):
     score_text = str(LIVES_COUNTER[0])
     font = pygame.font.Font(None, 50)
-    text = font.render('Жизни: ' + score_text, True, (255, 100, 100))
+    text = font.render('Жизни: ' + score_text, True, (255, 10, 100))
     text_x, text_y = 540, 600
     text_w, text_h = text.get_width(), text.get_height()
     surf.blit(text, (text_x, text_y))
-    pygame.draw.rect(surf, (255, 0, 0), (text_x - 10, text_y - 10, text_w +
+    pygame.draw.rect(surf, (255, 50, 125), (text_x - 10, text_y - 10, text_w +
                                          20, text_h + 20), 1)
+
+
+def draw_title(surf):
+    font = pygame.font.Font(None, 100)
+    text = font.render('Just push!', True, (255, 10, 100))
+    text_x, text_y = 180, 150
+    surf.blit(text, (text_x, text_y))
+
+
+def draw_game_over(surf):
+    font = pygame.font.Font(None, 100)
+    text = font.render('Game over', True, (255, 10, 100))
+    text_x, text_y = 180, 150
+    surf.blit(text, (text_x, text_y))

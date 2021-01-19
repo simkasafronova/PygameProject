@@ -1,6 +1,6 @@
 from initialization import *
 import pygame_gui
-from functions import draw_lives, draw_score
+from functions import draw_lives, draw_score, draw_title, draw_game_over, load_image
 from constants import *
 from particles import create_particles
 
@@ -12,7 +12,7 @@ class MainBall(pygame.sprite.Sprite):
         self.radius = radius
         self.image = pygame.Surface((radius * 2, radius * 2),
                                     pygame.SRCALPHA, 32)
-        pygame.draw.circle(self.image, (89, 36, 145), (radius, radius), radius)
+        pygame.draw.circle(self.image, (48, 217, 255), (radius, radius), radius)
         self.rect = pygame.Rect(main_x, main_y, radius * 2, radius * 2)
         self.alpha = 0
 
@@ -31,7 +31,7 @@ class OtherBall(pygame.sprite.Sprite):
         self.add(other_balls)
         self.image = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA,
                                     32)
-        pygame.draw.circle(self.image, (74, 201, 48), (radius, radius),
+        pygame.draw.circle(self.image, (80, 255, 80), (radius, radius),
                            radius)
         self.rect = pygame.Rect(self.x, self.y, radius * 2, radius * 2)
         self.alpha = 0
@@ -64,18 +64,28 @@ for i in range(10):
 clock = pygame.time.Clock()
 
 
+def congratulation():
+    pass
+
+
 def finish():
     finish_menu_manager = pygame_gui.UIManager((720, 720))
 
     another_play_button = pygame_gui.elements.UIButton(
-        relative_rect=pygame.Rect((285, 100), (150, 100)),
+        relative_rect=pygame.Rect((285, 300), (190, 70)),
         text='PLAY AGAIN',
         manager=finish_menu_manager
     )
 
     go_to_start_menu_button = pygame_gui.elements.UIButton(
-        relative_rect=pygame.Rect((285, 200), (150, 100)),
+        relative_rect=pygame.Rect((285, 400), (190, 70)),
         text='GO TO START MENU',
+        manager=finish_menu_manager
+    )
+
+    delete_previous_record = pygame_gui.elements.UIButton(
+        relative_rect=pygame.Rect((285, 500), (190, 70)),
+        text='DELETE PREVIOUS RECORD',
         manager=finish_menu_manager
     )
 
@@ -95,9 +105,25 @@ def finish():
                         LIVES_COUNTER[0] = 3
                         play()
                         finish_menu_running = False
+                    if event.ui_element == delete_previous_record:
+                        confirmation_dialog = \
+                            pygame_gui.windows.UIConfirmationDialog(
+                                rect=pygame.Rect((260, 260), (200, 200)),
+                                manager=finish_menu_manager,
+                                window_title='Подтверждение',
+                                action_long_desc='Вы уверены, что хотите '
+                                                 'обнулить свой рекорд?',
+                                action_short_name='YES',
+                                blocking=True
+                            )
+                if event.user_type == \
+                        pygame_gui.UI_CONFIRMATION_DIALOG_CONFIRMED:
+                    RECORD[0] = 0
+                    print('record has been switched off')
             finish_menu_manager.process_events(event)
         finish_menu_manager.update(time_delta2)
         finish_menu_manager.draw_ui(screen)
+        draw_game_over(screen)
         pygame.display.flip()
 
 
@@ -121,12 +147,19 @@ def play():
                         main_balls.sprites()[0].kill()
                         RUNNING_STATE[0] = 0
                         if LIVES_COUNTER[0] == 0:
+                            if SCORE_COUNTER[0] > RECORD[0]:
+                                congratulation()
+                                main_play_running = False
+                                RECORD[0] = SCORE_COUNTER[0]
                             SCORE_COUNTER[0] = 0
                             main_play_running = False
                             other_balls.empty()
                             finish()
-                            for i in range(len(other_balls.sprites())):
-                                other_balls.sprites()[i].kill()
+                            try:
+                                for i in range(len(other_balls.sprites())):
+                                    other_balls.sprites()[i].kill()
+                            except IndexError:
+                                pass
                 except AssertionError:
                     print('only 3 balls')
                     for i in range(7):
@@ -165,6 +198,7 @@ while first_menu_running:
         start_menu_manager.process_events(event)
     start_menu_manager.update(time_delta)
     start_menu_manager.draw_ui(screen)
+    draw_title(screen)
     pygame.display.flip()
 pygame.quit()
 
