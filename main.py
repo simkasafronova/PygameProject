@@ -1,8 +1,9 @@
 from initialization import *
 import pygame_gui
 from functions import draw_lives, draw_score, draw_title, draw_game_over
+from functions import load_image, draw_new_record
 from constants import *
-from classes import MainBall, OtherBall
+from classes import MainBall, OtherBall, AnimatedSprite
 
 
 for i in range(10):
@@ -11,8 +12,26 @@ for i in range(10):
 clock = pygame.time.Clock()
 
 
+firework = AnimatedSprite(load_image("Firework.png"), 6, 5, 250, 150)
+
+
 def congratulation():
-    pass
+    congr_running = True
+    congr_clock = pygame.time.Clock()
+    while congr_running:
+        screen.fill((25, 25, 25))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                congr_running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    congr_running = False
+                    finish()
+        animated.draw(screen)
+        animated.update()
+        draw_new_record(screen)
+        pygame.display.flip()
+        congr_clock.tick(30)
 
 
 def finish():
@@ -95,6 +114,7 @@ def play():
                         RUNNING_STATE[0] = 0
                         if LIVES_COUNTER[0] == 0:
                             if SCORE_COUNTER[0] > RECORD[0]:
+                                print('new record!')
                                 congratulation()
                                 main_play_running = False
                                 RECORD[0] = SCORE_COUNTER[0]

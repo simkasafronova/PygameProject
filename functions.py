@@ -54,3 +54,10 @@ def draw_game_over(surf):
     text = font.render('Game over', True, (255, 10, 100))
     text_x, text_y = 180, 150
     surf.blit(text, (text_x, text_y))
+
+
+def draw_new_record(surf):
+    font = pygame.font.Font(None, 100)
+    text = font.render('New record!', True, (80, 255, 80))
+    text_x, text_y = 180, 350
+    surf.blit(text, (text_x, text_y))
