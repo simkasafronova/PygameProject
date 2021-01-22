@@ -1,4 +1,3 @@
-import pygame
 import os
 import sys
 from constants import *

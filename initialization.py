@@ -5,12 +5,6 @@ size = width, height = 720, 720
 screen = pygame.display.set_mode((720, 720))
 screen_rect = (0, 0, width, height)
 
-all_sprites = pygame.sprite.Group()
-other_balls = pygame.sprite.Group()
-main_balls = pygame.sprite.Group()
-stars = pygame.sprite.Group()
-animated = pygame.sprite.Group()
-
 TIMER_GENERATE_OTHERBALLS = pygame.USEREVENT + 1
 pygame.time.set_timer(TIMER_GENERATE_OTHERBALLS, 1000)
 

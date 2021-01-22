@@ -1,7 +1,8 @@
-from initialization import *
-from constants import GRAVITY
+import pygame
+from constants import GRAVITY, all_sprites, particles
 from functions import load_image
 import random
+from initialization import screen_rect
 
 
 class Particle(pygame.sprite.Sprite):
@@ -15,7 +16,7 @@ class Particle(pygame.sprite.Sprite):
 
     def __init__(self, pos, dx, dy, name):
         super().__init__(all_sprites)
-        self.add(stars)
+        self.add(particles)
         if name == 'star':
             self.image = random.choice(self.many_stars)
         elif name == 'heart':

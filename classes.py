@@ -1,4 +1,3 @@
-from initialization import *
 from constants import *
 from particles import create_particles
 
@@ -12,11 +11,12 @@ class MainBall(pygame.sprite.Sprite):
                                     pygame.SRCALPHA, 32)
         pygame.draw.circle(self.image, (48, 217, 255), (radius, radius), radius)
         self.rect = pygame.Rect(main_x, main_y, radius * 2, radius * 2)
+        self.pos = 350
 
     def update(self, *args):
         if args[0][0]:
             main_balls.sprites()[0].rect = main_balls.sprites()[
-                0].rect.move(0, -6)
+                0].rect.move(0, -2)
 
 
 class OtherBall(pygame.sprite.Sprite):

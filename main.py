@@ -21,23 +21,20 @@ clock = pygame.time.Clock()
 firework = AnimatedSprite(load_image("Firework.png"), 6, 5, 250, 150)
 
 
-# def congratulation():
-#     congr_running = True
-#     congr_clock = pygame.time.Clock()
-#     while congr_running:
-#         screen.fill((25, 25, 25))
-#         for event in pygame.event.get():
-#             if event.type == pygame.QUIT:
-#                 congr_running = False
-#             if event.type == pygame.KEYDOWN:
-#                 if event.key == pygame.K_SPACE:
-#                     congr_running = False
-#                     finish()
-#         animated.draw(screen)
-#         animated.update()
-#         draw_new_record(screen)
-#         pygame.display.flip()
-#         congr_clock.tick(30)
+def congratulation():
+    while True:
+        screen.fill((25, 25, 25))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    finish()
+        animated.draw(screen)
+        animated.update()
+        draw_new_record(screen)
+        pygame.display.flip()
+        clock.tick(30)
 
 
 def finish():
@@ -69,11 +66,10 @@ def finish():
                 terminate()
             if event.type == pygame.USEREVENT:
                 if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
-                    if event.ui_element == go_to_start_menu_button:
-                        start_menu()
-                    elif event.ui_element == another_play_button:
-                        LIVES_COUNTER[0] = 3
+                    if event.ui_element == another_play_button:
                         play()
+                    elif event.ui_element == go_to_start_menu_button:
+                        start_menu()
                     if event.ui_element == delete_previous_record:
                         confirmation_dialog = \
                             pygame_gui.windows.UIConfirmationDialog(
@@ -90,16 +86,16 @@ def finish():
                     RECORD[0] = 0
                     print('record has been switched off')
             finish_menu_manager.process_events(event)
-        print('finish')
         finish_menu_manager.update(time_delta2)
         finish_menu_manager.draw_ui(screen)
+        print('finish')
         draw_game_over(screen)
         pygame.display.flip()
         clock.tick(30)
 
 
 def play():
-    v_otherballs, position_otherballs = 900, 0
+    v_otherballs, position_otherballs = 200, 0
     while True:
         screen.fill((25, 25, 25))
         for event in pygame.event.get():
@@ -110,51 +106,45 @@ def play():
                     RUNNING_STATE[0] = 1
             if event.type == TIMER_GENERATE_OTHERBALLS:
                 OtherBall(0, 150)
-
-
-
-            # if event.type == TIMER_CHECK_MAINBALLS:
-            #     try:
-            #         assert len( main_balls.sprites() ) > 3
-            #         if main_balls.sprites()[0].rect.y < 0:
-            #             LIVES_COUNTER[0] -= 1
-            #             main_balls.sprites()[0].kill()
-            #             RUNNING_STATE[0] = 0
-            #             # if LIVES_COUNTER[0] == 0:
-            #             #     if SCORE_COUNTER[0] > RECORD[0]:
-            #             #         print('new record')
-            #             #         RECORD[0] = SCORE_COUNTER[0]
-            #             #         other_balls.empty()
-            #             #         finish()
-            #             #     else:
-            #             #         SCORE_COUNTER[0] = 0
-            #             #         other_balls.empty()
-            #             #         finish()
-            #             #     try:
-            #             #         for i in range( len( other_balls.sprites() ) ):
-            #             #             other_balls.sprites()[i].kill()
-            #             #     except IndexError:
-            #             #         pass
-            #     except AssertionError:
-            #         print('only 3 balls')
-            #         for i in range(7):
-            #             MainBall(320, 350)
-
+            if event.type == TIMER_CHECK_MAINBALLS:
+                if len(main_balls) <= 3:
+                    for i in range(7):
+                        MainBall(320, 350)
+                if main_balls.sprites()[0].rect.y < 0:
+                    LIVES_COUNTER[0] -= 1
+                    main_balls.sprites()[0].kill()
+                    RUNNING_STATE[0] = 0
+                if LIVES_COUNTER[0] == 0:
+                    if SCORE_COUNTER[0] > RECORD[0]:
+                        print('new record')
+                        RECORD[0] = SCORE_COUNTER[0]
+                        SCORE_COUNTER[0] = 0
+                        other_balls.empty()
+                        LIVES_COUNTER[0] = 3
+                        congratulation()
+                    else:
+                        LIVES_COUNTER[0] = 3
+                        SCORE_COUNTER[0] = 0
+                        other_balls.empty()
+                        finish()
 
         draw_score(screen)
         draw_lives(screen)
 
-        stars.draw(screen)
-        stars.update()
+        particles.draw(screen)
+        particles.update()
         all_sprites.draw(screen)
 
-        position = v_otherballs * clock.tick() / 1000
+        position_otherballs = v_otherballs * clock.tick() / 1000
         other_balls.draw(screen)
-        other_balls.update(position)
+        other_balls.update(position_otherballs)
 
+        main_balls.draw(screen)
         main_balls.update(RUNNING_STATE)
         pygame.display.flip()
-        clock.tick(30)
+
+        print('play')
+        #clock.tick(30)
 
 
 start_menu_manager = pygame_gui.UIManager((720, 720))
@@ -164,37 +154,25 @@ start_playing_button = pygame_gui.elements.UIButton(
     manager=start_menu_manager
 )
 
-# start_menu_clock = pygame.time.Clock()
-# first_menu_running = True
-# while first_menu_running:
-#     time_delta = start_menu_clock.tick(60) / 100
-#     screen.fill((25, 25, 25))
-#     for event in pygame.event.get():
-#         if event.type == pygame.QUIT:
-#             first_menu_running = False
-#         if event.type == pygame.USEREVENT:
-#             if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
-#                 if event.ui_element == start_playing_button:
-#                     play()
-#         start_menu_manager.process_events(event)
-#     start_menu_manager.update(time_delta)
-#     start_menu_manager.draw_ui(screen)
-#     draw_title(screen)
-#     pygame.display.flip()
-# pygame.quit()
-
 
 def start_menu():
     while True:
+        time_delta = clock.tick(60) / 100
+        screen.fill((25, 25, 25))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
-            elif event.type == pygame.KEYDOWN or \
-                    event.type == pygame.MOUSEBUTTONDOWN:
-                play()
+            if event.type == pygame.USEREVENT:
+                if event.user_type == pygame_gui.UI_BUTTON_PRESSED:
+                    if event.ui_element == start_playing_button:
+                        play()
+            start_menu_manager.process_events(event)
+        start_menu_manager.update(time_delta)
+        start_menu_manager.draw_ui(screen)
         print('start')
+        draw_title(screen)
         pygame.display.flip()
         clock.tick(30)
 
 
-play()
+start_menu()
