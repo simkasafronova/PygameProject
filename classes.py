@@ -12,7 +12,6 @@ class MainBall(pygame.sprite.Sprite):
                                     pygame.SRCALPHA, 32)
         pygame.draw.circle(self.image, (48, 217, 255), (radius, radius), radius)
         self.rect = pygame.Rect(main_x, main_y, radius * 2, radius * 2)
-        self.alpha = 0
 
     def update(self, *args):
         if args[0][0]:
@@ -32,13 +31,14 @@ class OtherBall(pygame.sprite.Sprite):
         pygame.draw.circle(self.image, (80, 255, 80), (radius, radius),
                            radius)
         self.rect = pygame.Rect(self.x, self.y, radius * 2, radius * 2)
-        self.alpha = 0
-        self.vy = 0
+        self.pos = 0
 
     def update(self, *args):
         if self.rect.x >= 720:
             self.kill()
-        self.rect = self.rect.move(3, self.vy)
+        self.pos += args[0]
+        vx = self.pos - self.rect.x
+        self.rect = self.rect.move(vx, 0)
         if pygame.sprite.spritecollideany(self, main_balls):
             TO_GENERATE_STARS[0] += 1
             TO_GENERATE_HEARTS[0] += 1
