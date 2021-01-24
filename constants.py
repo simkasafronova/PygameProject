@@ -7,6 +7,7 @@ main_balls = pygame.sprite.Group()
 animated = pygame.sprite.Group()
 particles = pygame.sprite.Group()
 
+MOVING_MODES = [200, 300, 400, 170]
 
 TO_GENERATE_STARS = [0]
 TO_GENERATE_HEARTS = [0]

@@ -1,5 +1,6 @@
 from initialization import *
 import sys
+from random import choice
 import pygame_gui
 from functions import draw_lives, draw_score, draw_title, draw_game_over
 from functions import load_image, draw_new_record
@@ -105,6 +106,8 @@ def play():
                     RUNNING_STATE[0] = 1
             if event.type == TIMER_GENERATE_OTHERBALLS:
                 OtherBall(0, 150)
+            if event.type == TIMER_CHANGE_MODE:
+                v_otherballs = choice(MOVING_MODES)
             if event.type == TIMER_CHECK_MAINBALLS:
                 if len(main_balls) <= 5:
                     for i in range(5):
