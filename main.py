@@ -8,6 +8,7 @@ from classes import MainBall, OtherBall, AnimatedSprite
 
 
 def terminate():
+    open('record.txt', mode='w').write(str(RECORD[0]))
     pygame.quit()
     sys.exit()
 
@@ -84,11 +85,9 @@ def finish():
                 if event.user_type == \
                         pygame_gui.UI_CONFIRMATION_DIALOG_CONFIRMED:
                     RECORD[0] = 0
-                    print('record has been switched off')
             finish_menu_manager.process_events(event)
         finish_menu_manager.update(time_delta2)
         finish_menu_manager.draw_ui(screen)
-        print('finish')
         draw_game_over(screen)
         pygame.display.flip()
         clock.tick(30)
@@ -107,8 +106,8 @@ def play():
             if event.type == TIMER_GENERATE_OTHERBALLS:
                 OtherBall(0, 150)
             if event.type == TIMER_CHECK_MAINBALLS:
-                if len(main_balls) <= 3:
-                    for i in range(7):
+                if len(main_balls) <= 5:
+                    for i in range(5):
                         MainBall(320, 350)
                 if main_balls.sprites()[0].rect.y < 0:
                     LIVES_COUNTER[0] -= 1
@@ -116,7 +115,7 @@ def play():
                     RUNNING_STATE[0] = 0
                 if LIVES_COUNTER[0] == 0:
                     if SCORE_COUNTER[0] > RECORD[0]:
-                        print('new record')
+                        print(SCORE_COUNTER[0], 'new record')
                         RECORD[0] = SCORE_COUNTER[0]
                         SCORE_COUNTER[0] = 0
                         other_balls.empty()
@@ -143,9 +142,6 @@ def play():
         main_balls.update(RUNNING_STATE)
         pygame.display.flip()
 
-        print('play')
-        #clock.tick(30)
-
 
 start_menu_manager = pygame_gui.UIManager((720, 720))
 start_playing_button = pygame_gui.elements.UIButton(
@@ -169,7 +165,6 @@ def start_menu():
             start_menu_manager.process_events(event)
         start_menu_manager.update(time_delta)
         start_menu_manager.draw_ui(screen)
-        print('start')
         draw_title(screen)
         pygame.display.flip()
         clock.tick(30)

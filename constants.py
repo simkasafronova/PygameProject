@@ -19,3 +19,4 @@ LIVES_COUNTER = [3]
 RUNNING_STATE = [0]
 
 RECORD = [0]
+RECORD[0] = int(open('record.txt', mode='r').read())
