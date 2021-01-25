@@ -48,8 +48,8 @@ class OtherBall(pygame.sprite.Sprite):
                 SCORE_COUNTER[0] += 1
             if TO_GENERATE_HEARTS[0] % 11 == 0:
                 create_particles(coords, 'heart')
-                LIVES_COUNTER[0] += 1
-            self.vy = 2
+                if LIVES_COUNTER[0] < 3:
+                    LIVES_COUNTER[0] += 1
             main_balls.sprites()[0].kill()
             self.kill()
             RUNNING_STATE[0] = 0

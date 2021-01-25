@@ -75,7 +75,7 @@ def finish():
                     if event.ui_element == delete_previous_record:
                         confirmation_dialog = \
                             pygame_gui.windows.UIConfirmationDialog(
-                                rect=pygame.Rect((260, 260), (200, 200)),
+                                rect=pygame.Rect((230, 230), (300, 300)),
                                 manager=finish_menu_manager,
                                 window_title='Подтверждение',
                                 action_long_desc='Вы уверены, что хотите '
@@ -83,6 +83,7 @@ def finish():
                                 action_short_name='YES',
                                 blocking=True
                             )
+
                 if event.user_type == \
                         pygame_gui.UI_CONFIRMATION_DIALOG_CONFIRMED:
                     RECORD[0] = 0
@@ -95,7 +96,7 @@ def finish():
 
 
 def play():
-    v_otherballs, position_otherballs = 200, 0
+    v_otherballs, position_otherballs = 300, 0
     while True:
         screen.fill((25, 25, 25))
         for event in pygame.event.get():
@@ -118,7 +119,6 @@ def play():
                     RUNNING_STATE[0] = 0
                 if LIVES_COUNTER[0] == 0:
                     if SCORE_COUNTER[0] > RECORD[0]:
-                        print(SCORE_COUNTER[0], 'new record')
                         RECORD[0] = SCORE_COUNTER[0]
                         SCORE_COUNTER[0] = 0
                         other_balls.empty()

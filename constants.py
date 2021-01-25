@@ -7,7 +7,7 @@ main_balls = pygame.sprite.Group()
 animated = pygame.sprite.Group()
 particles = pygame.sprite.Group()
 
-MOVING_MODES = [200, 300, 400, 170]
+MOVING_MODES = [300, 500, 400, 450]
 
 TO_GENERATE_STARS = [0]
 TO_GENERATE_HEARTS = [0]
@@ -21,3 +21,5 @@ RUNNING_STATE = [0]
 
 RECORD = [0]
 RECORD[0] = int(open('record.txt', mode='r').read())
+
+DELETE_OTHERBALLS_COUNTER = [0]
